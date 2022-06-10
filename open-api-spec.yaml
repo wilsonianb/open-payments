@@ -6,7 +6,7 @@ info:
     name: Apache 2.0
     identifier: Apache-2.0
   description: |-
-    The Open Payments API is a simple REST API with 5 resource types: **account**, **quote**, **connection**, **incoming payment** and **outgoing payment**.  
+    The Open Payments API is a simple REST API with 4 resource types: **account**, **quote**, **incoming payment** and **outgoing payment**.
 
     The *service endpoint* for the API is always the URL of the account resource and all other resources (except connections) are sub-resources of the account.
     
@@ -16,16 +16,12 @@ info:
 
     A quote is a commitment from the account provider to deliver a particular amount to a receiver when sending a particular amount from the account. It is only valid for a limited time.
 
-    For privacy reasons a connection resource is not a sub-resource of an account.
-
     All resource and collection resource representations use JSON and the media-type `application/json`.  
 
     The `account` resource has three collections of sub-resources and a single **account holder** sub-resource:   
     1. `/incoming-payments` contains the **incoming payment** sub-resources  
     2. `/outgoing-payments` contains the **outgoing payment** sub-resources  
     3. `/quotes` contains the **quote** sub-resources
-
-    There is no normative path for **connection** resources. In this documentation we use the path `/connections` but implementations may use any arbitrary path.
 
     Access to resources and permission to execute the methods exposed by the API is determined by the grants given to the client represented by an access token used in API requests.
   summary: An API for open access to financial accounts to send and receive payments.
@@ -42,8 +38,6 @@ tags:
     description: outgoing payment operations
   - name: quote
     description: quote operations
-  - name: stream-connection
-    description: interledger STREAM connections
 paths:
   '/{accountId}':
     get:
@@ -82,41 +76,6 @@ paths:
         in: path
         required: true
         description: Account identifier
-  '/connections/{connectionId}':
-    get:
-      summary: Get ILP STREAM credentials for a connection
-      tags:
-        - stream-connection
-      responses:
-        '200':
-          description: Connection Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ilp-stream-connection'
-              examples:
-                Get connection:
-                  value:
-                    id: 'https://openpayments.guide/connections/016da9d5-c9a4-4c80-a354-86b915a04ff8'
-                    ilpAddress: g.ilp.iwuyge987y.98y0f34tsrt8y
-                    sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
-        '404':
-          description: Connection Not Found
-      operationId: get-ilp-stream-connection
-      description: |-
-        Fetch new connection credentials for an ILP STREAM connection.
-
-        A connection is an ephemeral resource that is created to accommodate new incoming payments.
-
-        A new set of credential will be generated each time this API is called.
-      security: []
-    parameters:
-      - schema:
-          type: string
-        name: connectionId
-        in: path
-        required: true
-        description: Connection identifier
   '/{accountId}/incoming-payments':
     post:
       summary: Create an Incoming Payment
@@ -146,10 +105,8 @@ paths:
                     completed: false
                     expiresAt: '2022-02-03T23:20:50.52Z'
                     externalRef: INV2022-02-0137
-                    ilpStreamConnection:
-                      id: 'http://openpayments.guide/connections/ff394f02-7b7b-45e2-b645-51d04e7c345c'
-                      ilpAddress: g.ilp.iwuyge987y.98y08y
-                      sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
+                    ilpAddress: g.ilp.iwuyge987y.98y08y
+                    sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
                     createdAt: '2022-03-12T23:20:50.52Z'
                     updatedAt: '2022-04-01T10:24:36.11Z'
         '401':
@@ -230,7 +187,6 @@ paths:
                           value: '250'
                           assetCode: USD
                           assetScale: 2
-                        ilpStreamConnection: 'https://openpayments.guide/connections/376df9d5-c9a4-4c80-a354-86b915a04ff8'
                         expiresAt: '2022-04-12T23:20:50.52Z'
                         createdAt: '2022-03-12T23:20:50.52Z'
                         updatedAt: '2022-04-01T10:24:36.11Z'
@@ -243,7 +199,6 @@ paths:
                           value: '100'
                           assetCode: USD
                           assetScale: 2
-                        ilpStreamConnection: 'https://openpayments.guide/connections/1f6df9d5-c9a4-4c80-a354-86b915a04ff8'
                         expiresAt: '2022-04-12T23:20:50.52Z'
                         createdAt: '2022-03-12T23:20:50.52Z'
                         updatedAt: '2022-04-01T10:24:36.11Z'
@@ -722,10 +677,8 @@ paths:
                     updatedAt: '2022-04-01T10:24:36.11Z'
                     description: Thanks for the flowers!
                     externalRef: INV-12876
-                    ilpStreamConnection:
-                      id: 'https://openpayments.guide/connections/4a1b0150-db73-49e8-8713-628baa4a17ff'
-                      ilpAddress: g.ilp.iwuyge987y.98y08y
-                      sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
+                    ilpAddress: g.ilp.iwuyge987y.98y08y
+                    sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
         '401':
           $ref: '#/components/responses/401'
         '403':
@@ -953,33 +906,6 @@ components:
           assetCode: USD
           assetScale: 2
           authServer: 'https://openpayments.guide/auth'
-    ilp-stream-connection:
-      title: ILP Stream Connection
-      type: object
-      description: An **ILP STREAM Connection** is an endpoint that returns unique STREAM connection credentials to establish a STREAM connection to the underlying account.
-      properties:
-        id:
-          type: string
-          format: uri
-          description: The URL identifying the endpoint.
-          readOnly: true
-        ilpAddress:
-          type: string
-          description: The ILP address to use when establishing a STREAM connection.
-          readOnly: true
-        sharedSecret:
-          type: string
-          description: The shared secret to use when establishing a STREAM connection.
-          readOnly: true
-      required:
-        - id
-        - ilpAddress
-        - sharedSecret
-      additionalProperties: false
-      examples:
-        - id: 'https://openpayments.guide/connections/016da9d5-c9a4-4c80-a354-86b915a04ff8'
-          ilpApddress: g.ilp.iwuyge987y.98y08y
-          sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
     incoming-payment:
       title: Incoming Payment
       description: 'An **incoming payment** resource represents a payment that will be, is currently being, or has been received by the account.'
@@ -1001,24 +927,8 @@ components:
           updatedAt: '2022-04-01T10:24:36.11Z'
           description: 'Hi Mo, this is for the cappuccino I bought for you the other day.'
           externalRef: Coffee w/ Mo on 10 March 22
-          ilpStreamConnection:
-            id: 'https://openpayments.guide/connections/032da9d5-c9a4-4c80-a354-86b915a04ff8'
-            ilpApddress: g.ilp.iwuyge987y.98y08y
-            sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
-        - id: 'https://openpayments.guide/alice/incoming-payments/456da9d5-c9a4-4c80-a354-86b915a04ff8'
-          accountId: 'https://openpayments.guide/alice/'
-          incomingAmount:
-            value: '2500'
-            assetCode: USD
-            assetScale: 2
-          receivedAmount:
-            value: '0'
-            assetCode: USD
-            assetScale: 2
-          expiresAt: '2022-04-12T23:20:50.52Z'
-          createdAt: '2022-03-12T23:20:50.52Z'
-          updatedAt: '2022-03-12T23:20:50.52Z'
-          ilpStreamConnection: 'https://openpayments.guide/connections/782da9d5-c9a4-4c80-a354-86b915a04ff8'
+          ilpApddress: g.ilp.iwuyge987y.98y08y
+          sharedSecret: 6jR5iNIVRvqeasJeCty6C+YB5X9FhSOUPCL/5nha5Vs=
       properties:
         id:
           type: string
@@ -1050,14 +960,14 @@ components:
         externalRef:
           type: string
           description: A reference that can be used by external systems to reconcile this payment with their systems. E.g. An invoice number.
-        ilpStreamConnection:
-          description: The Interledger STREAM Connection to use to pay into the account under this incoming payment
-          oneOf: 
-            -  $ref: '#/components/schemas/ilp-stream-connection'
-            -  type: string
-               format: uri
-               description: Endpoint that returns unique STREAM connection credentials to establish a STREAM connection to the underlying account.
-               readOnly: true
+        ilpAddress:
+          type: string
+          description: The ILP address to use when establishing a STREAM connection.
+          readOnly: true
+        sharedSecret:
+          type: string
+          description: The shared secret to use when establishing a STREAM connection.
+          readOnly: true
         createdAt:
           type: string
           format: date-time
