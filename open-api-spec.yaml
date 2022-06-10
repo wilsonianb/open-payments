@@ -8,13 +8,7 @@ info:
   description: |-
     The Open Payments API is a simple REST API with 4 resource types: **account**, **quote**, **incoming payment** and **outgoing payment**.
 
-    The *service endpoint* for the API is always the URL of the account resource and all other resources (except connections) are sub-resources of the account.
-    
-    An incoming payment defines meta data that is automatically attached to payments made into the account under that incoming payment. This facilitates automation of processes like reconciliation of payment into the account with external systems.
-
-    An outgoing payment is an instruction to make a payment out of the account.
-
-    A quote is a commitment from the account provider to deliver a particular amount to a receiver when sending a particular amount from the account. It is only valid for a limited time.
+    The *service endpoint* for the API is always the URL of the account resource and all other resources (except connections) are sub-resources of the account.  
 
     All resource and collection resource representations use JSON and the media-type `application/json`.  
 
@@ -39,7 +33,7 @@ tags:
   - name: quote
     description: quote operations
 paths:
-  '/{accountId}':
+  '/{id}':
     get:
       summary: Get a Payment Pointer
       tags:
@@ -72,7 +66,7 @@ paths:
     parameters:
       - schema:
           type: string
-        name: accountId
+        name: id
         in: path
         required: true
         description: Account identifier
@@ -120,8 +114,7 @@ paths:
               type: object
               properties:
                 incomingAmount:
-                  description: The maximum amount that should be paid into the account under this incoming payment.
-                  allOf: [ $ref: '#/components/schemas/amount' ]
+                  $ref: '#/components/schemas/amount'
                 expiresAt:
                   type: string
                   description: The date and time when payments into the incoming payment must no longer be accepted.
@@ -645,7 +638,7 @@ paths:
         in: path
         required: true
         description: Account identifier
-  '/{accountId}/incoming-payments/{incomingPaymentId}':
+  '/{accountId}/incoming-payments/{id}':
     get:
       summary: Get an Incoming Payment
       tags:
@@ -696,11 +689,11 @@ paths:
       - schema:
           type: string
           format: uuid
-        name: incomingPaymentId
+        name: id
         in: path
         required: true
         description: Incoming Payment identifier
-  '/{accountId}/incoming-payments/{incomingPaymentId}/complete':
+  '/{accountId}/incoming-payments/{id}/complete':
     post:
       summary: Complete an Incoming Payment
       tags:
@@ -752,11 +745,11 @@ paths:
       - schema:
           type: string
           format: uuid
-        name: incomingPaymentId
+        name: id
         in: path
         required: true
         description: Incoming Payment identifier
-  '/{accountId}/outgoing-payments/{outgoingPaymentId}':
+  '/{accountId}/outgoing-payments/{id}':
     get:
       summary: Get an Outgoing Payment
       tags:
@@ -809,11 +802,11 @@ paths:
       - schema:
           type: string
           format: uuid
-        name: outgoingPaymentId
+        name: id
         in: path
         required: true
         description: Outgoing Payment identifier
-  '/{accountId}/quotes/{quoteId}':
+  '/{accountId}/quotes/{id}':
     get:
       summary: Get a Quote
       tags:
@@ -859,7 +852,7 @@ paths:
       - schema:
           type: string
           format: uuid
-        name: quoteId
+        name: id
         in: path
         required: true
         description: Quote identifier
@@ -945,14 +938,12 @@ components:
           description: Describes whether the incoming payment has completed receiving fund.
           default: false
         incomingAmount:
-          description: The maximum amount that should be paid into the account under this incoming payment.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         receivedAmount:
-          description: The total amount that has been paid into the account under this incoming payment.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         expiresAt:
           type: string
-          description: The date and time when payments under this incoming payment will no longer be accepted.
+          description: The date and time when payments into the incoming payment will no longer be accepted.
           format: date-time
         description:
           type: string
@@ -1050,14 +1041,11 @@ components:
           format: uri
           description: The URL of the incoming payment or ILP STREAM Connection that is being paid.
         receiveAmount:
-          description: The total amount that should be received by the receiver when this outgoing payment has been paid.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         sendAmount:
-          description: The total amount that should be sent when this outgoing payment has been paid.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         sentAmount:
-          description: The total amount that has been sent under this outgoing payment.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         description:
           type: string
           description: Human readable description of the outgoing payment that will be visible to the account holder and shared with the receiver.
@@ -1129,11 +1117,9 @@ components:
           format: uri
           description: The URL of the incoming payment or ILP Stream Connection that would be paid.
         receiveAmount:
-          description: The total amount that should be received by the receiver.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         sendAmount:
-          description: The total amount that should be sent by the sender.
-          allOf: [ $ref: '#/components/schemas/amount' ]
+          $ref: '#/components/schemas/amount'
         expiresAt:
           type: string
           description: The date and time when the calculated `sendAmount` is no longer valid.
@@ -1175,7 +1161,7 @@ components:
         value:
           type: string
           format: uint64
-          description: The amount, scaled by the given scale.
+          description: The amount that must be paid into the receiver’s account.
         assetCode:
           type: string
           description: The asset code of the amount. This SHOULD be an ISO4217 currency code.
