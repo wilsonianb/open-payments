@@ -5,14 +5,14 @@ on:
     branches:
       - master
     paths:
-      - auth-server-open-api-spec.yaml
-      - open-api-spec.yaml
+      - 'auth-server-open-api-spec.yaml'
+      - 'open-api-spec.yaml'
   pull_request:
     branches:
       - master
     paths:
-      - auth-server-open-api-spec.yaml
-      - open-api-spec.yaml
+      - 'auth-server-open-api-spec.yaml'
+      - 'open-api-spec.yaml'
 
 jobs:
   validate:
