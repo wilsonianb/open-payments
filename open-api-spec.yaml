@@ -32,7 +32,10 @@ info:
   contact:
     email: tech@interledger.org
 servers:
-  - url: 'https://openpayments.guide'
+  - url: 'https://openpayments.guide/{basePath}'
+    variables:
+      basePath:
+        default: '.well-known/pay'
 tags:
   - name: payment-pointer
     description: payment pointer operations
