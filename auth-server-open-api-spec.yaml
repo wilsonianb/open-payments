@@ -117,6 +117,10 @@ paths:
                             value: '500'
                             assetCode: USD
                             assetScale: 2
+                          receiveAmount:
+                            value: '500'
+                            assetCode: USD
+                            assetScale: 2
                   client:
                     display:
                       name: Webmonize
