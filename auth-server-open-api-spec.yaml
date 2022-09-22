@@ -338,7 +338,8 @@ paths:
                   access:
                     type: array
                     items:
-                      $ref: '#/components/schemas/access'
+                      # $ref: '#/components/schemas/access'
+                      $ref: '#/components/schemas/access-outgoing'
                   key:
                     $ref: '#/components/schemas/key'
                   client_id:
@@ -866,16 +867,16 @@ components:
               - read-all
               - list
               - list-all
-          allOf:
-            - contains:
-                $ref: '#/components/schemas/read-actions'
-              minContains: 0
-              maxContains: 1
-            - contains:
-                $ref: '#/components/schemas/list-actions'
-              minContains: 0
-              maxContains: 1
-          uniqueItems: true
+          # allOf:
+          #   - contains:
+          #       $ref: '#/components/schemas/read-actions'
+          #     minContains: 0
+          #     maxContains: 1
+          #   - contains:
+          #       $ref: '#/components/schemas/list-actions'
+          #     minContains: 0
+          #     maxContains: 1
+          # uniqueItems: true
         identifier:
           type: string
           format: uri
