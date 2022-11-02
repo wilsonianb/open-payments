@@ -1,14 +1,4 @@
-openapi: 3.1.0
-info:
-  title: Open Payments - Shared schemas
-  version: '1.0'
-  license:
-    name: Apache 2.0
-    identifier: Apache-2.0
-  summary: Open Payments - Shared schemas
-  description: 'Shared schemas used across Open Payments APIs'
-  contact:
-    email: tech@interledger.org
+'$schema': 'https://json-schema.org/draft/2020-12/schema'
 components:
   schemas:
     access:
